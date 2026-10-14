@@ -1,12 +1,12 @@
 const { format } = require('date-fns'); // Import the format function from the date-fns library for formatting dates
-const { v4: uuid } = require('uuid'); // Import the v4 function from the uuid library for generating unique identifiers
+const { randomUUID } = require('crypto'); // Import the built-in UUID generator
 const fs = require('fs'); // Import the fs module for file system operations
 const fsPromises = require('fs').promises; // Import the promises API from the fs module for asynchronous file operations
 const path = require('path'); // Import the path module for handling file paths
 
 const logEvents = async (message, logFileName) => { // Define an asynchronous function to log events
     const dateTime = `${format(new Date(), 'yyyy-MM-dd\tHH:mm:ss')}`; // Format the current date and time
-    const logItem = `${dateTime}\t${uuid()}\t${message}\n`; // Create a log entry with the date, unique ID, and message
+    const logItem = `${dateTime}\t${randomUUID()}\t${message}\n`; // Create a log entry with the date, unique ID, and message
 
     if (process.env.VERCEL) {
         console.log(logItem.trimEnd());
