@@ -45,10 +45,14 @@ app.use(errorHandler); // Use the error handler middleware for handling errors
 
 mongoose.connection.once('open', () => { // Listen for the 'open' event on the Mongoose connection
     console.log('Connected to MongoDB');
-    app.listen(PORT, () => console.log(`Server is running on port ${PORT}`) ); // Start the server and listen on the specified port, logging a message when the server is running
+    if (!process.env.VERCEL) {
+        app.listen(PORT, () => console.log(`Server is running on port ${PORT}`) ); // Start the server locally
+    }
 });
 
 mongoose.connection.on('error', err => { // Listen for the 'error' event on the Mongoose connection
     console.error(err);
     logEvents(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log'); // Log the error details to a file named 'mongoErrLog.log'
 });
+
+module.exports = app;
