@@ -5,12 +5,29 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>techNotes API</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <title>techNotes Server</title>
+    <link rel="stylesheet" href="/CSS/style.css" />
 </head>
 
 <body>
-    <h1>techNotes</h1>
+    <main class="status">
+        <h1>technotes server:</h1>
+        <p>MongoDB <span id="database-status" class="checking">CHECKING</span></p>
+    </main>
+    <script>
+        const status = document.getElementById('database-status');
+
+        fetch('/health')
+            .then(async response => {
+                const result = await response.json();
+                status.textContent = result.database;
+                status.className = result.database === 'ON' ? 'online' : 'offline';
+            })
+            .catch(() => {
+                status.textContent = 'OFF';
+                status.className = 'offline';
+            });
+    </script>
 </body>
 
 </html>
