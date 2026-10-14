@@ -13,8 +13,6 @@ const PORT = process.env.PORT || 5000; // Set the port to the environment variab
 
 console.log(process.env.NODE_ENV); // Log the current environment (development, production, etc.) to the console
 
-connectDB(); // Call the function to connect to the MongoDB database
-
 app.use(logger); // Use the logger middleware for all incoming requests
 
 app.use(cors(corsOptions)); // Use the CORS middleware with the specified options
@@ -24,6 +22,15 @@ app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(cookieParser()); // Use the cookie-parser middleware for parsing cookies
 
 app.use('/' ,express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' directory
+
+app.use(['/auth', '/users', '/notes'], async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
 app.use('/',require('./routes/root')); // Use the routes defined in 'routes/root.js' for the root path
 app.use('/auth', require('./routes/authRoutes')); // Use the routes defined in 'routes/authRoutes.js' for the '/auth' path
@@ -43,16 +50,21 @@ app.use((req, res) => { // Middleware to handle 404 errors for any unmatched rou
 
 app.use(errorHandler); // Use the error handler middleware for handling errors
 
-mongoose.connection.once('open', () => { // Listen for the 'open' event on the Mongoose connection
-    console.log('Connected to MongoDB');
-    if (!process.env.VERCEL) {
-        app.listen(PORT, () => console.log(`Server is running on port ${PORT}`) ); // Start the server locally
-    }
-});
-
 mongoose.connection.on('error', err => { // Listen for the 'error' event on the Mongoose connection
     console.error(err);
     logEvents(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log'); // Log the error details to a file named 'mongoErrLog.log'
 });
+
+if (!process.env.VERCEL) {
+    connectDB()
+        .then(() => {
+            console.log('Connected to MongoDB');
+            app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+        })
+        .catch(error => {
+            console.error('Error connecting to MongoDB:', error);
+            process.exitCode = 1;
+        });
+}
 
 module.exports = app;

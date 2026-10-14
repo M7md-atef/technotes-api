@@ -4,7 +4,7 @@ const errorHandler = (err, req, res, next) => { // Define an error-handling midd
     logEvents(`${err.name}: ${err.message}\t${req.method}\t${req.headers.origin}\t${req.url}`, 'errorLog.log'); // Log the error name and message to 'errorLog.log'
     console.error(err.stack); // Log the error stack trace to the console
 
-    const status = res.statusCode ? res.statusCode : 500; // Determine the response status code, defaulting to 500 (server error) if not set
+    const status = res.statusCode >= 400 ? res.statusCode : 500; // Default unhandled errors to 500
     
     res.status(status); // Set the response status code
 
