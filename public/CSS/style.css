@@ -28,11 +28,6 @@ body {
     text-align: center;
 }
 
-.status p {
-    white-space: nowrap;
-    font-size: 1.35em;
-}
-
 .online {
     color: #22c55e;
 }
